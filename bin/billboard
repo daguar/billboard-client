@@ -1,10 +1,45 @@
 #!/usr/bin/env ruby
 
 require 'billboard_client'
+require 'thor'
 
-if ARGV.empty?
-  STDERR.puts 'You need to provide a URL to send to the billboard, yo!'
-else
-  response = BillboardClient.new.send(ARGV.first)
-  puts "Result: #{response['status']}"
+module BillboardCli
+  class Videos < Thor
+    desc "list", "List available video clips"
+    def list
+      video_csv_path = File.join(File.dirname(__FILE__), "../sources/videos.csv")
+      CSV.foreach(video_csv_path, headers: true) do |row|
+        puts row['keyword']
+      end
+    end
+
+    desc "send [VIDEONAME]", "Send the named video clip to the screen"
+    def send(video_name)
+      video_csv_path = File.join(File.dirname(__FILE__), "../sources/videos.csv")
+      video_data = CSV.read(video_csv_path, headers: true)
+      matching_row = video_data.find { |row| row['keyword'] == video_name }
+      video_url = matching_row['url']
+      response = BillboardClient.new.send(video_url)
+      puts "Response: #{response['status']}"
+    end
+  end
+
+  class Billboard < Thor
+    desc "send [MEDIA_URL]", "Send a URL to the billboard"
+    def send(url)
+      response = BillboardClient.new.send(ARGV.first)
+      puts "Response: #{response['status']}"
+    end
+
+    desc "set [BILLBOARD_URL]", "Configure the billboard to use"
+    def set(billboard_url)
+      ENV['BILLBOARD_URL'] = billboard_url
+      puts "The BILLBOARD_URL environment variable has been set to '#{billboard_url}'."
+    end
+
+    desc "videos [SUBCOMMAND]", "Various functionality related to videos"
+    subcommand "videos", Videos
+  end
 end
+
+BillboardCli::Billboard.start(ARGV)
