@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require 'billboard_client'
+
+if ARGV.empty?
+  STDERR.puts 'You need to provide a URL to send to the billboard, yo!'
+else
+  response = BillboardClient.new.send(ARGV.first)
+  puts "Result: #{response['status']}"
+end
