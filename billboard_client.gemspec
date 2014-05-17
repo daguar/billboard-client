@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.description = 'A client and CLI for the billboard app: https://github.com/mick/billboard/'
   s.author      = 'Dave Guarino'
   s.email       = 'dave@codeforamerica.org'
-  s.files       = ['lib/billboard_client.rb']
+  s.files       = ['lib/billboard_client.rb', 'sources/videos.csv']
   s.homepage    = 'https://github.com/daguar/billboard-client'
   s.license     = 'MIT'
   s.executables << 'billboard'
